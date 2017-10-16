@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<!--Interactive J application
+Coded By: Preksha Behede(PNB16@pitt.edu)
+---->
+<html>
+    <head>
+        <title>Interactive Java Application</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/jquery-ui.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        
+        <style>
+            #content, #content1 {
+                margin-left: 180px;
+                margin-right: 180px;
+                text-align: center;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+            }
+            
+            #divDroppable, #divDroppable1 {
+                width: 450px;
+                min-height: 50px;
+                list-style-type: none;
+                margin: 0;
+                padding: 5px 0 0 0;
+                float: left;
+                margin-right: 10px;
+            }
+			#divAnswer, #divAnswer1 {
+                border: 1px solid #eee;
+                width: 450px;
+                min-height: 50px;
+                list-style-type: none;
+                margin: 0;
+                padding: 5px 0 0 0;
+                float: left;
+                margin-right: 10px;
+            }
+            #divDroppable li {
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+            }
+            #divDroppable1 li {
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+            }
+
+			.sortable1_error{
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+				border:4px solid red;
+            }
+
+            .sortable1_error1{
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+				border:4px solid red;
+            }
+
+			.sortable1_success{
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+				border:4px solid green;
+            }
+
+			.sortable1_success1{
+                margin-left: -27px;
+				margin-top: -6px;
+                font-size: 20px;
+                width: 420px;
+				border:4px solid green;
+            }
+
+
+			#divAnswer li {
+                margin: 0 5px 5px 5px;
+                padding: 7px;
+                font-size: 20px;
+                width: 420px;
+            }
+
+            #divAnswer1 li {
+                margin: 0 5px 5px 5px;
+                padding: 7px;
+                font-size: 20px;
+                width: 420px;
+            }
+
+			.liLeft,.liLeft1, .liRight, .liRight1{
+			margin: 0 5px 5px 5px;
+			padding: 7px;
+			font-size: 20px;
+			width: 420px;
+			border-radius:8px;
+			}
+			.lisubgoal, .lisubgoal1{
+			border:none;
+			color:green;
+			font-family:cursive;
+			}
+			 .ui-tooltip {
+			padding: 10px 20px;
+			color: black;
+			border-radius: 10px;
+			font: normal 17px Calibri;
+			box-shadow: 0 0 7px black;
+		  }
+            
+            
+            #sortable1, #sortable2 {
+                border: 1px solid #eee;
+                width: 400px;
+                min-height: 60px;
+                list-style-type: none;
+                margin: 0;
+                padding: 5px 0 0 0;
+                float: right;
+                margin-right: 5px;
+            }
+
+            #sortable1 li, #sortable2 li {
+                margin: 0 5px 5px 5px;
+                padding: 5px;
+                font-size: 1.2em;
+                width: 390px;
+            }
+  
+         </style>
+         
+         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+         <script>
+            $( function() {
+                $( "#sortable1, #sortable2" ).sortable({
+                    connectWith: ".connectedSortable"
+                }).disableSelection();
+            } );
+         </script>
+         <script>
+			var result=[],goalID=0,correctAnswerTileForExmaple=0,totalGoals=0,totalFragments=0,goal_1=[],fragment=[];
+			var submittedAnswerSequence=[],CorrectAnswerSequence=[];
+			 $(document).ready(function() {
+				 $.ajax({
+                    url: "data/data.json",
+                    dataType: "text",
+                    success: function(data) {
+                        
+                        var json = $.parseJSON(data);
+						totalGoals=json.Clusters.cluster_goals.length;
+						for(var i=0;i<totalGoals;i++)
+						{
+							goal_1[i]=json.Clusters.cluster_goals[i];
+						}
+						document.getElementById('divGoal').innerHTML="Goal:"+goal_1[0].Goal_name;		
+						document.getElementById("divGoal3").innerHTML="Goal: "+goal_1[2].Goal_name;
+						totalFragments=json.Fragment.length;
+						for(var i=0;i<totalFragments;i++)
+						{
+							fragment[i]=json.Fragment[i];
+						}
+						buildFragments();
+						
+						
+                    }
+                });
+				
+			 });
+            $( function() {
+                $( "#divDroppable" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					if ($this.children('li').length > 1) {
+						//console.log('Only one per list!');
+						$(ui.sender).sortable('cancel');
+					}
+					}
+                }).disableSelection();
+            
+			$( " #divAnswer" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					}
+                }).disableSelection();
+            } );
+			 
+			$( function() {   
+			$( "#divDroppable" ).droppable({
+			  drop: function( event, ui ) {
+				//$( this )
+				//  .addClass( "ui-state-highlight" )
+				//  .find( "p" )
+				//    .html( "Dropped!" );
+				var draggableId = ui.draggable.attr("id");
+				ui.draggable.position({
+				my: "center",
+				at: "center",
+				of: $(this),
+				using: function(pos) {
+				  $(this).animate(pos, "slow", "linear");
+				}
+			  });				
+				 
+				$( "#divDroppable" ).sortable({
+				  dropOnEmpty: true
+				});
+					
+				  }
+				  
+				});
+				  $( "#tabs" ).tabs();
+		});
+		
+		function buildFragments() //runtime generate fragments by parsing data.json
+		{
+			for(var i=0;i<fragment.length;i++) //repeat for n fragments
+			{
+				if(fragment[i].Is_draggable=='true') //goes to solution #divAnswer
+				{
+					var li=document.createElement('li');
+					li.setAttribute("class","ui-state-default liRight");
+					li.setAttribute("id",fragment[i].f_id);
+					li.innerHTML=fragment[i].Fragment_text;
+					
+					var img=document.createElement('img');
+					img.setAttribute("src","images/help.png");
+					img.setAttribute("style","float:right;width: 8%;cursor: pointer;");
+					img.setAttribute("title",fragment[i].help.help_desc);
+					
+					li.appendChild(img);
+					document.getElementById('divAnswer').appendChild(li);
+					
+				}
+				else  //goes to problem section #divQuestion
+				{						
+						var li=document.createElement('li');
+						li.setAttribute("class","ui-state-default liLeft");
+						li.setAttribute("id",fragment[i].f_id);
+						li.innerHTML=fragment[i].Fragment_text;
+						
+						if(fragment[i].help.has_help=='true') //attach help icon to fragment
+						{
+							var img=document.createElement('img');
+							img.setAttribute("src","images/help.png");
+							img.setAttribute("style","float:right;width: 8%;cursor: pointer;");
+							img.setAttribute("title",fragment[i].help.help_desc);
+						
+							li.appendChild(img);
+						}
+						else if(fragment[i].Is_subgoal=='true') //assign class .lisubgoal
+						{
+							li.setAttribute("class","liLeft lisubgoal");
+						}
+					document.getElementById('divQuestion').appendChild(li);
+					if(fragment[i].f_id==6) //append droppable area after frgament 6
+					{
+						var li=document.createElement('li');
+						li.setAttribute("class","ui-state-default");
+						li.setAttribute("id","liDroppableTile");
+						li.setAttribute("style","height:48px;margin: 0 5px 5px 5px;width: 425px;border: 3px dashed #428bca;border-radius: 8px;");
+						
+						var ul=document.createElement('ul');
+						ul.setAttribute("id","divDroppable");
+						ul.setAttribute("class","connectedSortable");
+						
+						li.appendChild(ul);
+						document.getElementById('divQuestion').appendChild(li);
+					}
+				}
+			}
+			//assign tooltip after fragments are loaded
+			var tooltips = $( "[title]" ).tooltip({
+				  position: {
+					my: "left top",
+					at: "right+5 top-5",
+					collision: "none"
+				  }
+				});
+			//prepare droppable and sortable
+				$( "#divDroppable" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					if ($this.children('li').length > 1) {
+						//console.log('Only one per list!');
+						$(ui.sender).sortable('cancel');
+					}
+					}
+                }).disableSelection();
+            
+			$( " #divAnswer" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					}
+                }).disableSelection();
+				
+				$( "#divDroppable" ).droppable({
+			  drop: function( event, ui ) {
+				var draggableId = ui.draggable.attr("id");
+				ui.draggable.position({
+				my: "center",
+				at: "center",
+				of: $(this),
+				using: function(pos) {
+				  $(this).animate(pos, "slow", "linear");
+				}
+				});
+			}  
+		});
+		}
+		
+		function checkResult()  //check the result and show output
+		{
+			if(submittedAnswerSequence.length>0)
+				submittedAnswerSequence=[];
+			if(CorrectAnswerSequence.length>0)
+				CorrectAnswerSequence=[];
+			CorrectAnswerSequence=goal_1[goalID].correct_ans_set;
+			var obj=document.getElementById('divQuestion');
+			var sortableDiv=$("#divDroppable");
+			for(var j=0;j<obj.childNodes.length;j++)
+			{
+				if(obj.childNodes[j].id!='liDroppableTile')
+					submittedAnswerSequence.push(obj.childNodes[j].id);
+				else	
+					submittedAnswerSequence.push(obj.childNodes[j].childNodes[0].childNodes[0].id);
+			}	
+			
+			if(CorrectAnswerSequence.sort().join(',')=== submittedAnswerSequence.sort().join(',')){
+				//alert('Correct Answer !');
+				document.getElementById('resultMessage').style.color="green";
+				document.getElementById('divOutput').style.border="1px solid #8BC34A";
+				document.getElementById('resultMessage').style.display="block";
+				document.getElementById('resultMessage').innerHTML="Correct answer! :)";
+				document.getElementById('labelshowProgramOutput').style.display="block";
+				$("#"+sortableDiv[0].childNodes[0].id).removeClass("ui-state-default").addClass("sortable1_success");
+				$( "#divDroppable" ).sortable( "destroy" );
+			}
+			else 
+			{
+				//alert('Incorrect answer !');
+				document.getElementById('resultMessage').style.color="red";
+				document.getElementById('divOutput').style.border="1px solid red";
+				document.getElementById('resultMessage').style.display="block";
+				document.getElementById('resultMessage').innerHTML="Wrong answer, Keep trying ! :(";
+				document.getElementById('labelshowProgramOutput').style.display="block";
+				$("#"+sortableDiv[0].childNodes[0].id).removeClass("ui-state-default").addClass("sortable1_error");				
+				$( "#divDroppable" ).on( "sortstart", function( event, ui ) {$("#"+sortableDiv[0].childNodes[0].id).addClass("ui-state-default");$("#"+sortableDiv[0].childNodes[0].id).removeClass("sortable1_error"); } );
+			}	
+		}
+		function changeGoal() //executed on next button
+		{
+			if(goalID!=4)
+				goalID=goalID+1;
+			else
+				goalID=0;
+			document.getElementById('divOutput').style.border="1px solid black";
+			document.getElementById('divQuestion').innerHTML = "";
+			document.getElementById('divAnswer').innerHTML = "";
+			document.getElementById('labelshowProgramOutput').style.display="none";
+			document.getElementById('outputDescription').style.display="none";
+			document.getElementById('resultMessage').style.display="none";
+			document.getElementById('divGoal').innerHTML="Goal:"+goal_1[goalID].Goal_name;	
+			buildFragments();
+		}
+		function showOutputDescription() // show me what this program does
+		{
+			document.getElementById('outputDescription').innerHTML=goal_1[goalID].Output_desc;
+			document.getElementById('outputDescription').style.display="block";
+		}
+         </script>
+    </head>
+    
+    <body style="font-family:'Segoe UI';">
+        <div id="content" style="margin-top:-9px;">
+			<h3> Interactive Programming Examples in Java  </h3>
+			<div id="tabs" style="height: 800px;width:1200px;overflow: auto;font-family: 'SEGOE UI';box-shadow: 2px 2px 13px 7px rgba(158, 158, 158, 0.42);border-radius:8px;position: absolute;margin-left: -140px;">
+				<ul>
+					<li><a href="#tabs-1">Example</a></li>
+					<li><a href="#tabs-2">Faded Example</a></li>
+					<li><a href="#tabs-3">Problem</a></li>
+				</ul>
+				<center>
+				<!-------------Example begins here---------------->
+				<div id="tabs-1">
+					<center>
+						<table>
+							<tr>
+								<td width="18%"> </td>
+								<td width="60%">
+									<div class="panel panel-primary" style="font-size: 18px;">
+										<div class="panel-heading" style="padding:8px 15px;">
+											<h3 class="panel-title" style="font-size: 17px;">Instructions</h3>
+										</div>
+										<div class="panel-body" id='divGoal' style="text-align:center;">
+										</div>
+									</div>
+								</td>
+								<td width="10%">
+									<div style="border: 1px solid #428bca;width: 100px;height: 92px;margin-top: -22px;margin-left: 10px;position: relative;cursor:pointer;border-radius: 3px;" onclick="changeGoal();">
+									<center>
+										<img src='images/images.png' style="width: 39%;margin: auto;bottom: 0;top: 31px;left: 28px;position: absolute;" ><h4 style="font-size:24px;">Next</h4></img>
+									</center>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</center>
+					<table class="centerTable" width="100%" style="border-collapse: initial;border-spacing: 18px;display: inline-block;margin-top: -15px;font-family: 'segoe ui';font-size:16px;">
+						<tr align="left">
+							<td width="20%"> <b> </b></td>
+							<td width="40%"> <b>Solution: </b></td>
+							<td width="40%"> <b>Drag a tile from here: </b> </td>
+						</tr>
+						<tr>
+							<td style="vertical-align: top;">
+								<center>
+									<input type="button" value="Check" onclick="checkResult();" style="border: 1px solid #428bca;font-size: 19px;padding: 9px;width: 175px;background: rgba(66, 139, 202, 0.21);margin: 10px;font-family: 'segoe ui';font-weight:600;" />
+									<div id='divOutput' style="height:417px;border:1px solid #428bca;padding:17px;" placeholder="Output appears here">												
+										<div id='resultMessage' style="font-size: 20px;height:100px;margin-top:28px;"> 
+										</div>	
+										<div id='labelshowProgramOutput' style="display:none;font-size: 19px;height:108px;">
+											<a href="javascript:showOutputDescription();" style="color:#428bca;"><label>Show me what this program constructs ? </label></a>
+										</div>
+										<div>
+											<p id='outputDescription' style="font-size:20px;display:none;">
+											</p>
+										</div>
+									</div>
+								</center>
+							</td>
+							<center>
+							<td style="vertical-align: top;">
+								<center>
+								 <ul id='divQuestion' style="border:1px solid #eee;width: 450px;min-height: 50px;list-style-type: none; margin: 0;padding: 5px 0 0 0;float: left; margin-right: 10px;"></ul>
+								</center>
+							</td>
+							</center>
+							<center>
+							<td style="vertical-align: top;">
+							<center>
+								<ul id="divAnswer" class="connectedSortable">						
+								</ul>
+							</center>
+							</td>
+							</center>
+						</tr>			
+					</table>
+				</div>
+
+
+
+				<!-------------Faded Example begins here---------------->
+				<div id="tabs-2"> 
+
+
+
+         <script>
+			var goalID1=0, correctAnswerTileForExmaple1=0, totalGoals1=0, totalFragments1=0, goal1=[], temp, fragment1=[];
+			var submittedAnswerSequence1=[],CorrectAnswerSequence1=[];
+			 $(document).ready(function() {
+				 $.ajax({
+                    url: "data/data.json",
+                    dataType: "text",
+                    success: function(data) {
+
+                        var json = $.parseJSON(data);
+						totalGoals1=json.Clusters.cluster_goals.length;
+						for(var i=0;i<totalGoals1;i++)
+						{
+							goal1[i]=json.Clusters.cluster_goals[i];
+              if(goal1[i].Is_faded == "true")
+                temp=goal1[i];
+
+						}
+						document.getElementById('divGoal1').innerHTML="Goal:"+temp.Goal_name;
+						totalFragments1=json.Fragment.length;
+						for(var i=0;i<totalFragments1;i++)
+						{
+							fragment1[i]=json.Fragment[i];
+						}
+            document.getElementById('divQuestion1').innerHTML = "";
+      			document.getElementById('divAnswer1').innerHTML = "";
+      			document.getElementById('labelshowProgramOutput1').style.display="none";
+      			document.getElementById('outputDescription1').style.display="none";
+      			document.getElementById('resultMessage1').style.display="none";
+      			document.getElementById('divGoal1').innerHTML="Goal:"+temp.Goal_name;
+						buildFragments1();
+                    }
+                });
+
+			 });
+            $( function() {
+                $( "#divDroppable1" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					if ($this.children('li').length > 1) {
+						//console.log('Only one per list!');
+						$(ui.sender).sortable('cancel');
+					}
+					}
+                }).disableSelection();
+
+			$( " #divAnswer1" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					}
+                }).disableSelection();
+            } );
+
+			$( function() {
+			$( "#divDroppable1" ).droppable({
+			  drop: function( event, ui ) {
+				//$( this )
+				//  .addClass( "ui-state-highlight" )
+				//  .find( "p" )
+				//    .html( "Dropped!" );
+				var draggableId = ui.draggable.attr("id");
+				ui.draggable.position({
+				my: "center",
+				at: "center",
+				of: $(this),
+				using: function(pos) {
+				  $(this).animate(pos, "slow", "linear");
+				}
+			  });
+
+				$( "#divDroppable1" ).sortable({
+				  dropOnEmpty: true
+				});
+
+				  }
+
+				});
+				  $( "#tabs" ).tabs();
+		});
+
+		function buildFragments1() //runtime generate fragments by parsing data.json
+		{
+			for(var i=0;i<fragment1.length;i++) //repeat for n fragments
+			{
+				if(fragment1[i].Is_draggable=='true') //goes to solution #divAnswer
+				{
+					var li=document.createElement('li');
+					li.setAttribute("class","ui-state-default liRight");
+					li.setAttribute("id",fragment1[i].f_id);
+					li.innerHTML=fragment1[i].Fragment_text;
+
+					var img=document.createElement('img');
+					//img.setAttribute("src","images/help.png");
+					//img.setAttribute("style","float:right;width: 8%;cursor: pointer;");
+					//img.setAttribute("title",fragment[i].help.help_desc);
+
+					li.appendChild(img);
+					document.getElementById('divAnswer1').appendChild(li);
+
+				}
+				else  //goes to problem section #divQuestion
+				{
+						var li=document.createElement('li');
+						li.setAttribute("class","ui-state-default liLeft");
+						li.setAttribute("id",fragment1[i].f_id);
+						li.innerHTML=fragment1[i].Fragment_text;
+
+						if(fragment1[i].help.has_help=='true') //attach help icon to fragment
+						{
+							var img=document.createElement('img');
+							img.setAttribute("src","images/help.png");
+							img.setAttribute("style","float:right;width: 8%;cursor: pointer;");
+							img.setAttribute("title",fragment1[i].help.help_desc);
+
+							li.appendChild(img);
+						}
+						else if(fragment1[i].Is_subgoal=='true') //assign class .lisubgoal
+						{
+							li.setAttribute("class","liLeft1 lisubgoal1");
+						}
+					document.getElementById('divQuestion1').appendChild(li);
+					if(fragment[i].f_id==6) //append droppable area after frgament 6
+					{
+						var li=document.createElement('li');
+						li.setAttribute("class","ui-state-default");
+						li.setAttribute("id","liDroppableTile1");
+						li.setAttribute("style","height:48px;margin: 0 5px 5px 5px;width: 425px;border: 3px dashed #428bca;border-radius: 8px;");
+
+						var ul=document.createElement('ul');
+						ul.setAttribute("id","divDroppable1");
+						ul.setAttribute("class","connectedSortable");
+
+						li.appendChild(ul);
+						document.getElementById('divQuestion1').appendChild(li);
+					}
+				}
+			}
+			//assign tooltip after fragments are loaded
+			var tooltips = $( "[title]" ).tooltip({
+				  position: {
+					my: "left top",
+					at: "right+5 top-5",
+					collision: "none"
+				  }
+				});
+			//prepare droppable and sortable
+				$( "#divDroppable1" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					if ($this.children('li').length > 1) {
+						//console.log('Only one per list!');
+						$(ui.sender).sortable('cancel');
+					}
+					}
+                }).disableSelection();
+
+			$( " #divAnswer1" ).sortable({
+                    connectWith: ".connectedSortable",
+					receive: function(event, ui) {
+					var $this = $(this);
+					}
+                }).disableSelection();
+
+				$( "#divDroppable1" ).droppable({
+			  drop: function( event, ui ) {
+				var draggableId = ui.draggable.attr("id");
+				ui.draggable.position({
+				my: "center",
+				at: "center",
+				of: $(this),
+				using: function(pos) {
+				  $(this).animate(pos, "slow", "linear");
+				}
+				});
+			}
+		});
+		}
+
+    function displayHelp(){
+      alert("Look at the tiles on the left side properly based on the feedback you recieved by pressing check");
+    }
+		function checkResult1()  //check the result and show output
+		{
+			if(submittedAnswerSequence1.length>0)
+				submittedAnswerSequence1=[];
+			if(CorrectAnswerSequence.length>0)
+				CorrectAnswerSequence1=[];
+			CorrectAnswerSequence1=temp.correct_ans_set;
+			var obj=document.getElementById('divQuestion1');
+			var sortableDiv1=$("#divDroppable1");
+			for(var j=0;j<obj.childNodes.length;j++)
+			{
+				if(obj.childNodes[j].id!='liDroppableTile1')
+					submittedAnswerSequence1.push(obj.childNodes[j].id);
+				else
+					submittedAnswerSequence1.push(obj.childNodes[j].childNodes[0].childNodes[0].id);
+			}
+
+			//alert("correct seq is"+CorrectAnswerSequence);
+			//alert(submittedAnswerSequence);
+			if(CorrectAnswerSequence1.sort().join(',')=== submittedAnswerSequence1.sort().join(',')){
+				//alert('Correct Answer !');
+				document.getElementById('divOutput1').style.border="1px solid #8BC34A";
+				document.getElementById('resultMessage1').style.display="block";
+				document.getElementById('resultMessage1').innerHTML="Correct answer! :)";
+				document.getElementById('labelshowProgramOutput1').style.display="block";
+				$("#"+sortableDiv1[0].childNodes[0].id).removeClass("ui-state-default").addClass("sortable1_success");
+				$( "#divDroppable1" ).sortable( "destroy" );
+			}
+			else
+			{
+				//alert('Incorrect answer !');
+				document.getElementById('divOutput1').style.border="1px solid red";
+				document.getElementById('resultMessage1').style.display="block";
+				document.getElementById('resultMessage1').innerHTML="Wrong answer, Keep trying ! :(";
+				document.getElementById('labelshowProgramOutput1').style.display="block";
+				$("#"+sortableDiv1[0].childNodes[0].id).removeClass("ui-state-default").addClass("sortable1_error");
+				$( "#divDroppable1" ).on( "sortstart", function( event, ui ) {$("#"+sortableDiv1[0].childNodes[0].id).addClass("ui-state-default");$("#"+sortableDiv1[0].childNodes[0].id).removeClass("sortable1_error"); } );
+			}
+		}
+
+		function showOutputDescription1() // show me what this program does
+		{
+			document.getElementById('outputDescription1').innerHTML=temp.Output_desc;
+			document.getElementById('outputDescription1').style.display="block";
+		}
+         </script>
+					<center>
+						<table>
+							<tr>
+								<td width="18%"> </td>
+								<td width="60%">
+									<div class="panel panel-primary" style="font-size: 18px;">
+										<div class="panel-heading" style="padding:8px 15px;">
+											<h3 class="panel-title" style="font-size: 17px;">Instructions</h3>
+										</div>
+										<div class="panel-body" id='divGoal1' style="text-align:center;">
+										</div>
+									</div>
+								</td>
+								
+								<td width="10%">
+									 <div style="border: 1px solid #428bca;width: 100px;height: 92px;margin-top: -22px;margin-left: 10px;position: relative;cursor:pointer;border-radius: 3px;" onclick="displayHelp();">
+									<center>
+										<img src='images/help.png' style="width: 39%;margin: auto;bottom: 0;top: 31px;left: 28px;position: absolute;" ><h4 style="font-size:24px;">Hint</h4></img>
+									</center>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</center>
+
+					<table class="centerTable" width="100%" style="border-collapse: initial;border-spacing: 18px;display: inline-block;margin-top: -15px;font-family: 'segoe ui';font-size:16px;">
+						<tr align="left">
+							<td width="20%"> <b> </b></td>
+							<td width="40%"> <b>Solution: </b></td>
+							<td width="40%"> <b>Drag a tile from here: </b> </td>
+						</tr>
+						
+
+
+<tr>
+<td style="vertical-align: top;">
+<center>
+<input type="button" value="Check" onclick="checkResult1();" style="border: 1px solid #428bca;font-size: 19px;padding: 9px;width: 125px;background: rgba(66, 139, 202, 0.21);margin: 10px;font-family: 'segoe ui';font-weight:600;" />
+<div id='divOutput1' style="height:417px;border:1px solid #428bca;padding:17px;" placeholder="Output appears here">
+<div id='resultMessage1' style="font-size: 20px;height:100px;margin-top:28px;">
+</div>
+<div id='labelshowProgramOutput1' style="display:none;font-size: 20px;height:108px;">
+<a href="javascript:showOutputDescription1();" style="color:#428bca;"><label>Show me what this program constructs ? </label></a>
+</div>
+<div>
+											<p id='outputDescription1' style="font-size:20px;display:none;">
+											</p>
+										</div>
+									</div>
+								</center>
+							</td>
+							<center>
+							<td style="vertical-align: top;">
+								<center>
+								 <ul id='divQuestion1' style="border:1px solid #eee;width: 450px;min-height: 50px;list-style-type: none; margin: 0;padding: 5px 0 0 0;float: left; margin-right: 10px;"></ul>
+								</center>
+							</td>
+							</center>
+							<center>
+							<td style="vertical-align: top;">
+							<center>
+								<ul id="divAnswer1" class="connectedSortable">
+
+								</ul>
+							</center>
+							</td>
+							</center>
+						</tr>			
+					</table>
+				</div>
+
+				<!-- Div ends --> 
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-------------Problem begins here---------------->
+	<div id="tabs-3">     
+            <center>
+		<table>
+                    <tr>
+                        <td width="18%"> </td>
+                        <td width="60%">
+                            <div class="panel panel-primary" style="font-size: 18px;">
+                            <div class="panel-heading" style="padding:8px 15px;">
+                            <h3 class="panel-title" style="font-size: 17px;">Instructions</h3>
+                            </div>
+                            <div class="panel-body" id='divGoal3' style="text-align:center;">
+                            </div>
+                            </div>
+			</td>
+								
+			<td width="10%">
+				<div style="border: 1px solid #428bca;width: 100px;height: 92px;margin-top: -22px;margin-left: 10px;position: relative;cursor:pointer;border-radius: 3px;" onclick="hintFunction();">
+                                <center>
+                                    <img src='images/help.png' style="width: 39%;margin: auto;bottom: 0;top: 31px;left: 28px;position: absolute;" ><h4 style="font-size:24px;">Hint</h4></img>
+                                </center>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </center>    
+		
+            <table class="centerTable" width="100%" style="border-collapse: initial;border-spacing: 18px;display: inline-block;margin-top: -15px;font-family: 'segoe ui';font-size:16px;">
+                <tr align="left">
+                    <td width="20%"> <b> </b></td>
+                    <td width="40%"> <b>Solution: </b></td>
+                    <td width="40%"> <b>Drag a tile from here: </b> </td>
+                </tr>
+                <tr>
+                    <td style="vertical-align: top;">
+                        <center>
+                            <input type="button" value="Check" onclick="myFunction();" style="border: 1px solid #428bca;font-size: 19px;padding: 9px;width: 175px;background: rgba(66, 139, 202, 0.21);margin: 10px;font-family: 'segoe ui';font-weight:600;" />
+                                <div id='demo' style="font-size: 19px;height:417px;border:1px solid #428bca;padding:17px;" placeholder="Output appears here">												
+								
+                                </div>
+                        </center>
+                    </td>
+                            <center>
+                                <td style="vertical-align: top;">
+                                    <center>
+                                        <ul id="sortable1" class="connectedSortable" style="font-size:16px;"></ul>	
+							   
+                                    </center>
+                                </td>
+                            </center>
+                            <center>
+                                    <td style="vertical-align: top;">
+                                        <center>
+                                            <ul id="sortable2" class="connectedSortable" style="font-size:16px;">
+                                            <li id="li7" class="ui-state-default" style="text-align: left;padding-left: 50px;border-radius: 8px;"></li>
+                                            <li id="li9" class="ui-state-default" style="text-align: left;padding-left: 100px;border-radius: 8px;"></li>
+                                            <li id="li1" class="ui-state-default" style="text-align: left;border-radius: 8px"></li>
+                                            <li id="li6" class="ui-state-default" style="text-align: left;padding-left: 80px;border-radius: 8px;"></li>
+                                            <li id="li5" class="ui-state-default" style="text-align: left;padding-left: 100px;border-radius: 8px;"></li>
+                                            <li id="li3" class="ui-state-default" style="text-align: left;padding-left: 80px;border-radius: 8px;"></li>
+                                            <li id="li4" class="ui-state-default" style="text-align: left;padding-left: 80px;border-radius: 8px;"></li>
+                                            <li id="li2" class="ui-state-default" style="text-align: left;padding-left: 40px;border-radius: 8px;"></li>	
+                                            <li id="li8" class="ui-state-default" style="text-align: left;border-radius: 8px;"></li>
+                                            <li id="li10" class="ui-state-default" style="text-align: left;padding-left: 100px;border-radius: 8px;"></li>
+                                            </ul>	
+                                        </center>
+                                    </td>
+                            </center>
+                    </tr>		
+            </table>	
+       
+        <script>
+            var goalID=0,correctAnswerTileForExmaple=0,totalGoals=0,totalFragments=0,goal=[],fragment=[];
+            var result=[];
+            var countClicks = 0;
+                
+            $(document).ready(function() {      
+                    $.ajax({
+                    url: "data/data_problem.json",
+                    dataType: "text",
+                    success: function(data) {
+                        
+                        var json = $.parseJSON(data);
+                        totalGoals=json.Clusters.cluster_goals.length;
+                        for(var i=0;i<totalGoals;i++){
+                            goal[i]=json.Clusters.cluster_goals[i];
+                        }
+                        document.getElementById("divGoal3").innerHTML="Goal: "+goal[2].Goal_name;
+                        
+                        totalFragments=json.Fragment.length;
+                        for(var i=0;i<totalFragments;i++){
+                            fragment[i]=json.Fragment[i];
+                        }
+                       //xu code
+						document.getElementById("li1").innerHTML=fragment[0].Fragment_text;
+                        document.getElementById("li2").innerHTML=fragment[1].Fragment_text;
+                        document.getElementById("li3").innerHTML=fragment[3].Fragment_text;
+                        document.getElementById("li4").innerHTML=fragment[5].Fragment_text;
+                        document.getElementById("li5").innerHTML=fragment[11].Fragment_text;
+                        document.getElementById("li6").innerHTML=fragment[7].Fragment_text;
+                        document.getElementById("li7").innerHTML=fragment[8].Fragment_text;
+                        document.getElementById("li8").innerHTML=fragment[9].Fragment_text;
+                        document.getElementById("li9").innerHTML=fragment[10].Fragment_text;
+                        document.getElementById("li10").innerHTML=fragment[6].Fragment_text;
+                        
+                        result=goal[2].correct_ans_set;
+                    }
+            });
+            }); 
+            
+            function myFunction() {
+                var res = document.getElementById("sortable1");
+                var arr = [];
+                
+            
+                for (var ii = 0; ii < res.childNodes.length; ii++){
+                    var childId = res.childNodes[ii].id.replace('li','');
+					//childId.replace('li','');
+                    arr.push(childId);
+                }
+
+                if(arr.toString() === result.toString()){
+                    document.getElementById("demo").innerHTML = "Correct with "+countClicks+" hint";
+                    document.getElementById("sortable1").style.borderColor = "green";
+                    document.getElementById("demo").style.borderColor = "green";
+                    document.getElementById("demo").style.color = "green";
+                }else if(arr.sort().join('')=== result.sort().join('')){
+                    document.getElementById("demo").innerHTML = "Code fragements Misplace! This can be fixed\n\
+                    by switch the sequence of fragments.";
+                    document.getElementById("sortable1").style.borderColor = "red";
+                    document.getElementById("demo").style.borderColor = "red";
+                    document.getElementById("demo").style.color = "red";
+                }else{
+                    document.getElementById("demo").innerHTML = "Code fragements\n\
+                    in your program are wrong, or in wrong order. This can be fixed\n\
+                    by moving,removing, or replacing highlighted fragments."+"<br><br><br>"+
+                    "Click on Hint button if you need help.";
+                    document.getElementById("sortable1").style.borderColor = "red";
+                    document.getElementById("demo").style.borderColor = "red";
+                    document.getElementById("demo").style.color = "red";
+                    
+                    for (var i = 0; i < arr.length; i++) {
+                        if (arr[i] === '9') {
+                            document.getElementById("li9").style.borderColor = "red";
+                        }else if(arr[i] === '10'){
+                            document.getElementById("li10").style.borderColor = "red";
+                        }
+                    }
+                }
+                
+                
+            }
+            
+           function hintFunction(){
+                var res = document.getElementById("sortable1");
+                var arr = [];
+                for (var ii = 0; ii < res.childNodes.length; ii++){
+                    var childId = res.childNodes[ii].id.replace('li','');
+                    arr.push(childId);
+                }
+                //alert(arr);
+                var al = arr.length;
+                if (arr.length<8){
+                    alert("Code fragements should be more, please add fragements as 8!");
+                }else if (arr.length>8){
+                    alert("Code fragements should be less, please move fragements as 8!");
+                }
+                for (var i = 0; i < al; i++) {
+                        if ((arr[i] === '9')&&(al<9)&&(al>7)) {
+                            alert("Move tile 'list[i] = 2 * i + 1;' to the line 5 with the wrong order");
+                        }else if((arr[i] === '10')&&(al<9)&&(al>7)){
+                            alert("Move tile 'list[i] = 2 * i + 1;' to the line 5 with the wrong order");
+                        }
+                }
+                countClicks++;
+            }
+        </script>
+            </div>
+        </div>
+	</div>
+    </body>
+</html>

@@ -1,0 +1,259 @@
+{
+  "Entity _id": 1,
+  "Entity_name": "array",
+  "Clusters": {
+    "Cluster_id": 1,
+    "Cluster_name": "Array initialization",
+    "cluster_goals": [
+      {
+        "Goal_id": 1,
+        "Goal_name": "Construct a program that creates an array of length 5 and fills it up with value 3.",
+        "Is_problem": "false",
+        "Is_faded": "false",
+        "correct_ans_set": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "Output_desc": "This program fills up array with value 3: [3,3,3,3,3]"
+      },
+      {
+        "Goal_id": 2,
+        "Goal_name": "Drag a tile to the highlighted field to construct a program that creates an array of length 5 and fills up the array with the first five even integers.",
+        "Is_problem": "false",
+        "Is_faded": "false",
+        "correct_ans_set": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          11,
+          8,
+          9,
+          10
+        ],
+        "Output_desc": "This program fills up array with first five even integers: [0,2,4,6,8]"
+      },
+      {
+        "Goal_id": 3,
+        "Goal_name": "Drag a tile to the highlighted field to construct a program that creates an array of length 5 and fills up the array with the first five odd integers.",
+        "Is_problem": "false",
+        "Is_faded": "false",
+        "correct_ans_set": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "Output_desc": "This program fills up array with first five odd integers: [1,3,5,7,9]"
+      },
+      {
+        "Goal_id": 4,
+        "Goal_name": "Drag a tile to the highlighted field to construct a program that creates an array of length 5 and decrements each element of the array by 1.",
+        "Is_problem": "false",
+        "Is_faded": "false",
+        "correct_ans_set": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          13,
+          8,
+          9,
+          10
+        ],
+        "Output_desc": "This program fills up array with integers: [-1,-1,-1,-1,-1]"
+      },
+      {
+        "Goal_id": 5,
+        "Goal_name": "Drag a tile to the highlighted field to construct a program that creates an array of length 5 and increment each element of the array by 1.",
+        "Is_problem": "false",
+        "Is_faded": "false",
+        "correct_ans_set": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          14,
+          8,
+          9,
+          10
+        ],
+        "Output_desc": "This program fills up array with integers: [1,1,1,1,1]"
+      }
+    ]
+  },
+  "Fragment": [
+    {
+      "f_id": 1,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "public class ArrayInitialization{",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 2,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "    public void initArray{",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 3,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "        //Step 1: Creating the array",
+      "Is_subgoal": "true"
+    },
+    {
+      "f_id": 4,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "true",
+        "help_desc": "A list of integers is intialized with length 5. All elements of array will have default value 0."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "        int[] list = new int[5];",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 5,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "        //Step 2: Filling the array",
+      "Is_subgoal": "true"
+    },
+    {
+      "f_id": 6,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "true",
+        "help_desc": "A for loop for traversing the array and initializing each of its elements. The number of loop iteration is the same as the length of the list (i.e., 5). "
+      },
+      "Goal_id": 1,
+      "Fragment_text": "        for ( int i = 0; i < list.length; i++ ) {",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 7,
+      "Is_draggable": "true",
+      "help": {
+        "has_help": "true",
+        "help_desc": "Assings value 3 to the i-th element in the array."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "            list[i] = 3;",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 8,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "        }",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 9,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "    }",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 10,
+      "Is_draggable": "false",
+      "help": {
+        "has_help": "false",
+        "help_desc": ""
+      },
+      "Goal_id": 1,
+      "Fragment_text": "}",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 11,
+      "Is_draggable": "true",
+      "help": {
+        "has_help": "true",
+        "help_desc": "Assings an even number to i-th element in the array by multiplying the index i of that element by 2. The first iteration of loop assigns 0 to the first element of the array, the second iteration of loop assigns 2 to the second element of array, the third iteration of loop assigns 4 to the third element of array, and so on."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "            list[i] = 2 * i;",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 12,
+      "Is_draggable": "true",
+      "help": {
+        "has_help": "true",
+        "help_desc": "Assings an odd number to i-th element in the array by multiplying the index i of that element by 2 and then increment it by 1. The first iteration of loop assigns 1 to the first element of the array, the second iteration of loop assigns 3 to the second element of array, the third iteration of loop assigns 5 to the third element of array, and so on."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "            list[i] = 2 * i + 1;",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 13,
+      "Is_draggable": "true",
+      "help": {
+        "has_help": "true",
+        "help_desc": "Decrements the i-th element of the array by 1.  The first iteration of loop assigns -1 to the first element of the array, the second iteration of loop assigns -1 to the second element of array, the third iteration of loop assigns -1 to the third element of array, and so on."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "            list[i] = list[i] - 1;",
+      "Is_subgoal": "false"
+    },
+    {
+      "f_id": 14,
+      "Is_draggable": "true",
+      "help": {
+        "has_help": "true",
+        "help_desc": "Increments the i-th element of the array by 1.  The first iteration of loop assigns 1 to the first element of the array, the second iteration of loop assigns 1 to the second element of array, the third iteration of loop assigns 1 to the third element of array, and so on."
+      },
+      "Goal_id": 1,
+      "Fragment_text": "            list[i] = list[i] + 1;",
+      "Is_subgoal": "false"
+    }
+  ]
+}
